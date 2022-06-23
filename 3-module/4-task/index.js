@@ -7,11 +7,7 @@ function showSalary(users, age) {
       name = arrFilter[i].name;
       balance = arrFilter[i].balance;
       string += `${name}, ${balance}\n`;
-      console.log(string);
   }
   string = string.substring(0, string.length - 1);
-
-  console.log(string);
-
   return string;
 }
