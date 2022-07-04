@@ -14,7 +14,7 @@ function highlight(table) {
         
         if (!getAttribute){
           
-          elem.setAttribute('hidden', 'hidden');
+          elem.hidden = true;
 
         } else if (getAttribute == 'true') {
           
