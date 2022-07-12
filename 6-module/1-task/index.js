@@ -5,16 +5,17 @@
  * Пример одного элемента, описывающего строку таблицы
  *
  *      {
- *          name: 'Ilia',
- *          age: 25,
- *          salary: '1000',
- *          city: 'Petrozavodsk'
- *      }
+     *          name: 'Ilia',
+     *          age: 25,
+     *          salary: '1000',
+     *          city: 'Petrozavodsk'
+     *      },
  *
  */
-export default class UserTable {
+ export default class UserTable {
   constructor(rows) {
     this.elem = document.createElement('table');
+
     this.elem.innerHTML = `
       <thead>
           <tr>
@@ -53,9 +54,10 @@ export default class UserTable {
     if (event.target.tagName != 'BUTTON') {
       return;
     }
-    
+
     let tr = event.target.closest('tr');
 
     tr.remove();
   }
+
 }
