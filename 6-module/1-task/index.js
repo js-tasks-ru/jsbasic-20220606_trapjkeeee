@@ -12,7 +12,7 @@
      *      },
  *
  */
-export default class UserTable {
+ export default class UserTable {
   constructor(rows) {
     this.elem = document.createElement('table');
 
