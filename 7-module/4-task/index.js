@@ -99,20 +99,13 @@ export default class StepSlider {
     let progress = this.elem.querySelector('.slider__progress');
     let sliderValue = this.elem.querySelector('.slider__value');
     let stepsLength = this.elem.querySelectorAll('.slider__steps span');
-
-    
-
-
-
-
-
+ 
     thumb.ondragstart = () => false;
     thumb.onpointerdown = () => false;
     thumb.onpointermove = () => false;
     if(slider){
       slider.classList.add('slider_dragging');
       
-  
       function onMouseMove(event){
       
       let left  = event.clientX - slider.getBoundingClientRect().left;
@@ -133,12 +126,7 @@ export default class StepSlider {
         let segments = stepsLength.length - 1;
         let approximateValue = leftRelative * segments;
         let value = Math.round(approximateValue);
-        sliderValue.innerHTML = value;
-  
-  
-  
-        
-        
+        sliderValue.innerHTML = value;  
     }
   
     thumb.addEventListener('pointermove', onMouseMove);
@@ -149,12 +137,10 @@ export default class StepSlider {
   
         thumb.onpointerup = null;
   
-  
       }
     }
     
   }
-
 
   sliderChange(event){
     let slider = event.target.closest('.slider');
@@ -169,6 +155,4 @@ export default class StepSlider {
       this.elem.dispatchEvent(myEvent);
       }
     }
-    
-    
 }
