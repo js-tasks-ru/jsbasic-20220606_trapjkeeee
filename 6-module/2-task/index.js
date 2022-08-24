@@ -23,7 +23,7 @@ export default class ProductCard {
   }
   addProduct(event){
     
-    if (event.target.classList.contains('card__button')){
+    if (event.target.closest('.card__button')){
       
       let myEvent = new CustomEvent("product-add", {
         detail: this.product.id, 

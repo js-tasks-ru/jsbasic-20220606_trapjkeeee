@@ -42,13 +42,16 @@ export default class Carousel {
 
     
   }
-  addProduct(event){    
-    if (event.target.classList.contains('carousel__button')){ 
+  addProduct(event){  
+      
+    if (event.target.closest('.carousel__button')){ 
       let data = event.target.closest('.carousel__slide');
+      
         let myEvent = new CustomEvent("product-add", {
           detail: data.dataset.id, 
           bubbles: true 
       });
+      
       this.elem.dispatchEvent(myEvent);
       };
     }
@@ -110,5 +113,3 @@ export default class Carousel {
   }
 
 }
-
-
