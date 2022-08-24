@@ -49,7 +49,7 @@ export default class Carousel {
       
         let myEvent = new CustomEvent("product-add", {
           detail: data.dataset.id, 
-          bubbles: true 
+          bubbles: true, 
       });
       
       this.elem.dispatchEvent(myEvent);
