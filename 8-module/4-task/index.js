@@ -13,14 +13,9 @@ export default class Cart {
   }
 
   addProduct(product) {
-    if (!product) {
-      return;
-    }
-
     let cartItem = this.cartItems.find(
-      item => item.product.id === product.id
+      item => item.product.id == product.id
     );
-
     if (!cartItem) {
       cartItem = {
         product,
@@ -38,7 +33,7 @@ export default class Cart {
     let cartItem = this.cartItems.find(item => item.product.id == productId);
     cartItem.count += amount;
 
-    if (cartItem.count === 0) {
+    if (cartItem.count == 0) {
       this.cartItems.splice(this.cartItems.indexOf(cartItem), 1);
     }
 
@@ -113,84 +108,98 @@ export default class Cart {
 
   renderModal() {
     this.modal = new Modal();
-    this.modal.setTitle("Your order");
-    
-    let cartItemsHTML = ``;
 
-    for (let item of this.cartItems){
-      cartItemsHTML += this.renderProduct(item.product, item.count).outerHTML;
+    this.modal.setTitle("Your order");
+
+    this.modalBody = document.createElement(`div`);
+
+    for (let { product, count } of this.cartItems) {
+      this.modalBody.append(this.renderProduct(product, count));
     }
-    
-    this.modal.setBody(createElement(`<div>${cartItemsHTML}<\div><div>${this.renderOrderForm().outerHTML}</div>`));
-    
+
+    this.modalBody.append(this.renderOrderForm());
+
+    this.modalBody.addEventListener("click", this.onModalBodyClick);
+
+    this.modalBody.querySelector("form").onsubmit = (event) => this.onSubmit(event);
+
+    this.modal.setBody(this.modalBody);
+
+    // when modal is closed, we forget about it, don't update it any more
+    this.modal.elem.addEventListener('modal-close', () => {
+      this.modal = null;
+      this.modalBody = null;
+    });
 
     this.modal.open();
-
-    
-    this.modal.elem.querySelector('.cart-form').onsubmit = (event) => this.onSubmit(event);
-
-    this.modal.elem.querySelector('.modal__body').onclick = (evt) => {
-      if (evt.target.closest('.cart-counter__button')) {
-        let productIdNew = '';
-        productIdNew = evt.target.closest('.cart-product').getAttribute('data-product-id');
-
-        if (evt.target.closest('.cart-counter__button').className.includes('plus')) {
-          this.updateProductCount(productIdNew, '+1');
-        }
-        else if (evt.target.closest('.cart-counter__button').className.includes('minus')) {
-          this.updateProductCount(productIdNew, '-1');
-        }
-      }
-    };
-
-
   }
 
-  onProductUpdate(cartItem) {
-    if (document.body.className === 'is-modal-open') {
-      for (let item of this.modal.elem.querySelectorAll('.cart-product')) {
-        if (item.getAttribute('data-product-id') === cartItem.product.id) {
-          item.querySelector('.cart-counter__count').textContent = cartItem.count;
-          item.querySelector('.cart-product__price').textContent = `€${(cartItem.count * cartItem.product.price).toFixed(2)}`;
-        }
-      }
-      this.modal.elem.querySelector('.cart-buttons__info-price').textContent = `€${this.getTotalPrice().toFixed(2)}`;
-      if (this.getTotalCount() === 0) {
-        this.modal.close();
-      }
+  onModalBodyClick = (event) => {
+    if (event.target.closest(".cart-counter__button")) {
+      let productElem = event.target.closest("[data-product-id]");
+      let productId = productElem.dataset.productId;
+      this.updateProductCount(
+        productId,
+        event.target.closest(".cart-counter__button_plus") ? 1 : -1
+      );
+    }
+  };
+
+  onProductUpdate({product, count}) {
+    this.cartIcon.update(this);
+
+    if (!this.modal || !document.body.classList.contains('is-modal-open')) {
+      return;
     }
 
-    this.cartIcon.update(this);
+    if (this.cartItems.length == 0) {
+      // No products, close the modal
+      this.modal.close();
+      return;
+    }
+
+    if (count == 0) {
+      this.modalBody.querySelector(`[data-product-id="${product.id}"]`).remove();
+    } else {
+      this.modalBody.querySelector(`[data-product-id="${product.id}"] .cart-counter__count`).innerHTML = count;
+
+      this.modalBody.querySelector(`[data-product-id="${product.id}"] .cart-product__price`).innerHTML = '€' + (count * product.price).toFixed(2);
+    }
+
+    this.modalBody.querySelector(`.cart-buttons__info-price`).innerHTML = '€' + this.getTotalPrice().toFixed(2);
   }
 
-  onSubmit(event) {
+  async onSubmit(event) {
     event.preventDefault();
-    event.target.querySelector('[type=submit]').classList.add('is-loading');
-    this.formData = new FormData(event.target.closest('.cart-form'));
-   
-    fetch('https://httpbin.org/post', {
-      method: 'POST',
-      body: this.formData
-    }).then(response => { 
-      if(response.ok === true) {
-        this.modal.setTitle('Success!');  
-        this.cartItems.splice(0, this.cartItems.length);
-        this.cartIcon.update(this);
-        this.modal.setBody(createElement(`
-        <div class="modal__body-inner">
+
+    this.modalBody
+      .querySelector('button[type="submit"]')
+      .classList.add("is-loading");
+    let form = this.modalBody.querySelector('.cart-form');
+    let userData = new FormData(form);
+
+    await fetch('https://httpbin.org/post', { method: 'POST', body: userData });
+
+    this.modal.setTitle("Success!");
+    this.modalBody
+      .querySelector('button[type="submit"]')
+      .classList.remove("is-loading");
+
+    this.cartItems = [];
+    this.cartIcon.update(this);
+
+    this.modalBody.innerHTML = `
+      <div class="modal__body-inner">
         <p>
-         Order successful! Your order is being cooked :) <br>
-         We’ll notify you about delivery time shortly.<br>
-         <img src="/assets/images/delivery.gif">
+          Order successful! Your order is being cooked :) <br>
+          We’ll notify you about delivery time shortly.<br>
+          <img src="/assets/images/delivery.gif">
         </p>
-        </div>
-      `));
-      }
-    });
+      </div>
+      `;
   };
 
   addEventListeners() {
     this.cartIcon.elem.onclick = () => this.renderModal();
   }
 }
-
