@@ -40,6 +40,7 @@ export default class RibbonMenu {
     let arrowLeft = document.querySelector('.ribbon__arrow_left');
     let arrowRight = document.querySelector('.ribbon__arrow_right');
     
+    
     if (event.target.closest('.ribbon__arrow_right')){
       switch(scrollLeft){
 
@@ -64,6 +65,9 @@ export default class RibbonMenu {
     let scrollRight = scrollWidth - scrollLeft - clientWidth;
     let arrowLeft = document.querySelector('.ribbon__arrow_left');
     let arrowRight = document.querySelector('.ribbon__arrow_right');
+
+    
+    
     
     if (event.target.closest('.ribbon__arrow_left')){
       switch(scrollRight){
@@ -71,6 +75,7 @@ export default class RibbonMenu {
         case 185:
         ribbonInner.scrollBy(-350, 0);
         arrowLeft.classList.toggle('ribbon__arrow_visible');
+        
         break;
 
         case 0:
